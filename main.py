@@ -1,4 +1,5 @@
 from flask import Flask, url_for, request
+import os
 
 app = Flask(__name__)
 
@@ -332,6 +333,47 @@ def results(nickname, level, rating):
                   </body>
                 </html>
             """
+
+@app.route('/load_photo', methods=['POST', 'GET'])
+def load_photo():
+    profile_photo = 'img/default.jpg'
+    if os.path.isfile('./static/img/profile.jpg'):
+        profile_photo = 'img/profile.jpg'
+
+    if request.method == 'GET':
+        return f'''<!doctype html>
+                        <html lang="en">
+                          <head>
+                            <meta charset="utf-8">
+                            <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+                             <link rel="stylesheet"
+                             href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css"
+                             integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1"
+                             crossorigin="anonymous">
+                            <link rel="stylesheet" type="text/css" href="{url_for('static', filename='css/styles.css')}" />
+                            <title>Отбор астронавтов</title>
+                          </head>
+                          <body>
+                            <h1>Загрузка фотографии</h1>
+                            <h2>для участия в миссии</h2>
+                            <form class="p-3" method="post" enctype="multipart/form-data">
+                                <div class="form-group">
+                                    <label for="photo">Приложите фотографию</label>
+                                    <input type="file" class="form-control-file" id="photo" name="file">
+                                </div>
+                                <div class="form-group pt-3">
+                                    <img src="{url_for('static', filename=profile_photo)}" width="300px">
+                                </div>
+                                <div class="form-group pt-3">
+                                    <button type="submit" class="btn btn-primary">Отправить</button>
+                                </div>
+                            </form>
+                          </body>
+                        </html>'''
+    elif request.method == 'POST':
+        f = request.files['file']
+        f.save('./static/img/profile.jpg')
+        return "Форма отправлена"
 
 
 if __name__ == '__main__':
